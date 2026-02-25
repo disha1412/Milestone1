@@ -1,0 +1,25 @@
+seed: 42
+
+data:
+  source: "tensorflow_datasets"
+  tfds_name: "lfw"
+  cache_dir: "data/lfw_cache"
+
+split_policy:
+  description: "Split by identity. 70% train, 15% val, 15% test."
+  train: 0.70
+  val: 0.15
+  test: 0.15
+
+pairs:
+  num_positive_per_split: 500
+  num_negative_per_split: 500
+  output_dir: "outputs/pairs"
+
+manifest:
+  output_path: "outputs/manifest.json"
+
+benchmark:
+  n_vectors: 10000
+  vector_dim: 128
+  output_path: "outputs/bench/results.txt"
