@@ -2,6 +2,10 @@
 data/
 outputs/
 
+# Reports are committed (lightweight PDF evidence for grading)
+!reports/
+!reports/*.pdf
+
 # Virtual environments
 .venv/
 env/

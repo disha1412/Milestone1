@@ -1,0 +1,33 @@
+seed: 42
+
+data:
+  source: "tensorflow_datasets"
+  tfds_name: "lfw"
+  cache_dir: "data/lfw_cache"
+
+splits:
+  threshold_selection: "val"
+  final_report: "test"
+
+pairs:
+  baseline_dir: "outputs/pairs"
+  improved_dir: "outputs/pairs_improved"
+  improved_max_images_per_identity: 5  # data-centric change: cap overrepresented identities
+
+features:
+  image_size: 32          # resize each image to 32x32 grayscale → 1024-dim vector
+  output_path: "outputs/features.npz"
+
+evaluation:
+  threshold_rule: "maximize_balanced_accuracy"
+  threshold_range:
+    start: 0.0
+    stop: 1.0
+    steps: 101
+  output_dir: "outputs/eval"
+
+tracking:
+  runs_file: "outputs/runs.json"
+
+report:
+  output_path: "reports/milestone2_report.pdf"
