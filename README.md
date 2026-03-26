@@ -87,12 +87,9 @@ python scripts/run_evaluation.py --config configs/m2.yaml --run improved_test_fi
 
 Run results are logged to `outputs/runs.json`.
 
-### 5. Generate PDF report
+### 5. Go through PDF report
 
-```bash
-python scripts/generate_report.py --config configs/m2.yaml
-# Output: reports/milestone2_report.pdf
-```
+https://github.com/disha1412/Milestone1/blob/main/reports/VANSH%20AND%20DISHA%E2%80%94%20Milestone%202%20Report.pdf
 
 ### 6. Run tests
 
