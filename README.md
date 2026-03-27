@@ -10,7 +10,7 @@ This project builds a reproducible face verification system on LFW. Given two fa
 
 **Data-centric improvement (v2):** Capped overrepresented identities to at most 10 images (`max_images_per_identity=10`) so no single identity dominates the pair distribution. New pairs generated into `outputs/pairs_v2/`. Threshold re-selected on the same val split.
 
-**Report:** `reports/milestone2_report.pdf`
+**Report:** `reports/MSML_MSAI 605 — Milestone 2 Report.pdf`
 
 ---
 
@@ -104,7 +104,7 @@ pytest tests/ -v
 | Selected threshold (baseline) | `outputs/eval/val/selected_threshold.json` |
 | Error analysis (baseline) | `outputs/eval/val/error_analysis.json` |
 | ROC curve (v2) | `outputs/eval_v2/val/roc.png` |
-| Milestone 2 report | `reports/milestone2_report.pdf` |
+| Milestone 2 report | `reports/MSML_MSAI 605 — Milestone 2 Report.pdf` |
 
 ---
 
