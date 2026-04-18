@@ -1,10 +1,12 @@
-cat > /mnt/user-data/outputs/requirements.txt << 'EOF'
 numpy>=1.24
 pandas>=2.0
 pyyaml>=6.0
 matplotlib>=3.7
+Pillow>=10.0
 pytest>=7.4
 tensorflow>=2.13
 tensorflow-datasets>=4.9
 importlib_resources>=6.0
-EOF
+facenet-pytorch>=2.5.3
+torch>=2.0
+torchvision>=0.15

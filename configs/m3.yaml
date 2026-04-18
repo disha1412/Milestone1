@@ -1,0 +1,59 @@
+seed: 42
+
+data:
+  source: "tensorflow_datasets"
+  tfds_name: "lfw"
+  cache_dir: "data/lfw_cache"
+
+split_policy:
+  description: "Split by identity. 70% train, 15% val, 15% test."
+  train: 0.70
+  val: 0.15
+  test: 0.15
+
+pairs:
+  num_positive_per_split: 500
+  num_negative_per_split: 500
+  output_dir: "outputs/pairs"
+  max_images_per_identity: null
+  min_images_for_positive: 2
+
+manifest:
+  output_path: "outputs/manifest.json"
+
+benchmark:
+  n_vectors: 10000
+  vector_dim: 128
+  output_path: "outputs/bench/results.txt"
+
+evaluation:
+  threshold_sweep:
+    n_thresholds: 100
+  threshold_selection_rule: "max_balanced_accuracy"
+  locked_threshold: null
+  artifacts_dir: "outputs/eval"
+  runs_dir: "outputs/runs"
+
+embedding:
+  model: "facenet_pytorch"
+  pretrained: "vggface2"
+  target_size: [160, 160]
+  embedding_dim: 512
+  description: >
+    FaceNet InceptionResnetV1 pretrained on VGGFace2. If facenet_pytorch is not
+    installed, the pipeline falls back to a TF Hub MobileNetV2 feature vector,
+    and finally to a normalized pixel vector as a last resort.
+
+inference:
+  threshold: 0.35
+  threshold_selection_rule: "max_balanced_accuracy"
+  threshold_selected_on: "val"
+  confidence_formula: >
+    sigmoid(10 * (score - threshold)); maps to [0,1] where 0.5 = exactly on
+    the boundary, >0.5 = same-person confidence, <0.5 = different-person confidence.
+  confidence_range: [0.0, 1.0]
+
+load_test:
+  n_requests: 50
+  n_workers: 4
+  output_path: "outputs/load_test/results.json"

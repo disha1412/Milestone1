@@ -1,7 +1,3 @@
-"""
-Unit tests for src/metrics.py, src/validation.py, src/tracking.py, src/error_analysis.py
-"""
-
 import csv
 import json
 import os
@@ -27,9 +23,10 @@ from src.validation import (
     validate_no_split_leakage,
 )
 from src.error_analysis import build_results_df, slice_false_positives, slice_false_negatives, summarize_slice
+from src.inference import apply_threshold, compute_confidence
+from src.embeddings import preprocess_image, extract_embedding
+from src.similarity import cosine_similarity_vectorized
 
-
-# ── metrics ──────────────────────────────────────────────────────────────────
 
 def test_confusion_matrix_perfect():
     scores = np.array([0.9, 0.1, 0.8, 0.2])
@@ -77,8 +74,6 @@ def test_select_threshold():
     t = select_threshold_max_balanced_accuracy(scores, labels, thresholds)
     assert 0.4 <= t <= 0.7
 
-
-# ── validation ────────────────────────────────────────────────────────────────
 
 def _make_pair_csv(rows, tmpdir, filename="pairs.csv"):
     path = os.path.join(tmpdir, filename)
@@ -170,8 +165,6 @@ def test_validate_no_split_leakage_overlap():
     assert len(errors) == 1
 
 
-# ── error analysis ─────────────────────────────────────────────────────────────
-
 def _make_results_df():
     pairs = pd.DataFrame({
         "left_path": ["a", "b", "c", "d"],
@@ -207,3 +200,70 @@ def test_summarize_slice_empty():
     empty = df[df["label"] == 99]
     summary = summarize_slice(empty, "test")
     assert summary["count"] == 0
+
+
+def test_apply_threshold_above():
+    assert apply_threshold(0.8, 0.5) == 1
+
+
+def test_apply_threshold_below():
+    assert apply_threshold(0.3, 0.5) == 0
+
+
+def test_apply_threshold_equal():
+    assert apply_threshold(0.5, 0.5) == 1
+
+
+def test_confidence_at_boundary():
+    c = compute_confidence(0.5, 0.5)
+    assert abs(c - 0.5) < 1e-6
+
+
+def test_confidence_above_threshold_gt_half():
+    c = compute_confidence(0.9, 0.5)
+    assert c > 0.5
+
+
+def test_confidence_below_threshold_lt_half():
+    c = compute_confidence(0.1, 0.5)
+    assert c < 0.5
+
+
+def test_confidence_range():
+    for score in np.linspace(-1.0, 1.0, 20):
+        c = compute_confidence(float(score), 0.35)
+        assert 0.0 <= c <= 1.0
+
+
+def test_preprocess_image_shape():
+    img = np.random.randint(0, 256, (100, 100, 3), dtype=np.uint8)
+    arr = preprocess_image(img)
+    assert arr.shape == (160, 160, 3)
+    assert arr.dtype == np.float32
+
+
+def test_preprocess_image_normalized():
+    img = np.random.randint(0, 256, (80, 80, 3), dtype=np.uint8)
+    arr = preprocess_image(img)
+    assert abs(arr.mean()) < 1.0
+
+
+def test_extract_embedding_shape():
+    img = np.random.randint(0, 256, (160, 160, 3), dtype=np.uint8)
+    emb = extract_embedding(img, model_backend=("mock", None))
+    assert emb.ndim == 1
+    assert emb.shape[0] > 0
+
+
+def test_cosine_similarity_identical():
+    a = np.array([[1.0, 0.0, 0.0]])
+    b = np.array([[1.0, 0.0, 0.0]])
+    s = cosine_similarity_vectorized(a, b)
+    assert abs(s[0] - 1.0) < 1e-6
+
+
+def test_cosine_similarity_orthogonal():
+    a = np.array([[1.0, 0.0]])
+    b = np.array([[0.0, 1.0]])
+    s = cosine_similarity_vectorized(a, b)
+    assert abs(s[0]) < 1e-6
